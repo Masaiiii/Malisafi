@@ -1,8 +1,5 @@
 {
   "name": "Copy of Mali Safi",
   "description": "The premier hyper-local marketplace for Malindi & Watamu. Buy, sell, rent, and find local services with ease.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
+  "requestFramePermissions": []
 }

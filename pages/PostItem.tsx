@@ -14,6 +14,7 @@ const PostItem: React.FC<PostItemProps> = ({ lang, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [isQuickGig, setIsQuickGig] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -23,6 +24,18 @@ const PostItem: React.FC<PostItemProps> = ({ lang, onClose }) => {
     location: 'Malindi CBD',
     whatsapp: '',
   });
+
+  // Handle Image Selection
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Helper to generate description using Gemini
   const handleGenerateDescription = async () => {
@@ -62,6 +75,9 @@ const PostItem: React.FC<PostItemProps> = ({ lang, onClose }) => {
 
     const category = isQuickGig ? 'gigs' : formData.category;
 
+    // Use uploaded image or fallback to random one if none selected
+    const finalImageUrl = imagePreview || `https://picsum.photos/400/300?random=${Math.floor(Math.random() * 1000)}`;
+
     await createListing({
       title: formData.title,
       description: formData.description,
@@ -69,7 +85,7 @@ const PostItem: React.FC<PostItemProps> = ({ lang, onClose }) => {
       category: category,
       location: formData.location,
       whatsapp: formData.whatsapp,
-      image_url: `https://picsum.photos/400/300?random=${Math.floor(Math.random() * 1000)}`, // Mock image for now
+      image_url: finalImageUrl,
       user_name: 'Local User',
       expires_at: expiresAt
     });
@@ -186,14 +202,35 @@ const PostItem: React.FC<PostItemProps> = ({ lang, onClose }) => {
             ></textarea>
           </div>
 
-          {/* Photo (Fake Upload) */}
+          {/* Photo Upload */}
           <div>
              <label className="block text-sm font-medium text-gray-700 mb-1">{UI_TEXT.uploadImage[lang]}</label>
-             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
-               <span className="text-2xl block mb-2">📷</span>
-               <p className="text-xs">Tap to add photo</p>
-               <input type="file" className="hidden" />
-             </div>
+             <label className="block border-2 border-dashed border-gray-300 rounded-lg p-4 text-center text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer overflow-hidden relative">
+               <input 
+                type="file" 
+                className="hidden" 
+                accept="image/*" 
+                onChange={handleImageSelect}
+               />
+               
+               {imagePreview ? (
+                 <div className="relative h-48 w-full">
+                   <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="w-full h-full object-contain rounded"
+                   />
+                   <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity text-white font-medium">
+                     Change Photo
+                   </div>
+                 </div>
+               ) : (
+                 <div className="py-4">
+                   <span className="text-3xl block mb-2">📷</span>
+                   <p className="text-xs">Tap to upload photo</p>
+                 </div>
+               )}
+             </label>
           </div>
 
           {/* Phone */}
