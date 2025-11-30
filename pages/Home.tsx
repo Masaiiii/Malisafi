@@ -7,6 +7,7 @@ import ListingCard from '../components/ListingCard';
 import QuickPostModal from '../components/QuickPostModal';
 import PostItem from './PostItem';
 import { fetchListings } from '../services/dataService';
+import ListingDetail from './ListingDetail';
 
 interface HomeProps {
   lang: Language;
@@ -18,6 +19,7 @@ const Home: React.FC<HomeProps> = ({ lang, onViewChange }) => {
   const [showQuickPost, setShowQuickPost] = useState(false);
   const [showPostItem, setShowPostItem] = useState(false);
   const [listings, setListings] = useState<Listing[]>([]);
+  const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadListings();
@@ -32,6 +34,10 @@ const Home: React.FC<HomeProps> = ({ lang, onViewChange }) => {
     setShowPostItem(false);
     loadListings();
   };
+
+  if (selectedListingId) {
+    return <ListingDetail id={selectedListingId} lang={lang} onBack={() => setSelectedListingId(null)} />;
+  }
 
   return (
     <div className="min-h-screen pb-32 relative overflow-hidden">
@@ -64,9 +70,9 @@ const Home: React.FC<HomeProps> = ({ lang, onViewChange }) => {
         </div>
       </div>
 
-      {/* Quick Categories - Animated Pills */}
-      <div className="mb-10 px-4 animate-fade-in-up delay-200">
-         <div className="flex gap-3 overflow-x-auto no-scrollbar py-2">
+      {/* Quick Categories - Animated Pills - Fixed Scrolling Padding */}
+      <div className="mb-10 animate-fade-in-up delay-200">
+         <div className="flex gap-3 overflow-x-auto no-scrollbar py-2 px-4">
             {[
               { id: 'fundis', label: 'Fundi', icon: '🛠️', bg: 'from-blue-400 to-blue-600' },
               { id: 'stays', label: 'Villas', icon: '🌴', bg: 'from-teal-400 to-teal-600' },
@@ -77,7 +83,7 @@ const Home: React.FC<HomeProps> = ({ lang, onViewChange }) => {
               <button 
                 key={cat.id} 
                 onClick={() => onViewChange(cat.id === 'jobs' || cat.id === 'lost' ? 'more' : cat.id)}
-                className="group relative flex items-center gap-2 px-5 py-3 rounded-2xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1 active:scale-95 bg-white dark:bg-white/5 border border-white/20 overflow-hidden"
+                className="group relative flex items-center gap-2 px-5 py-3 rounded-2xl shadow-sm hover:shadow-lg transition-all transform hover:-translate-y-1 active:scale-95 bg-white dark:bg-white/5 border border-white/20 overflow-hidden shrink-0"
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${cat.bg} opacity-0 group-hover:opacity-10 transition-opacity`}></div>
                 <span className="text-xl group-hover:scale-125 transition-transform duration-300">{cat.icon}</span>
@@ -87,15 +93,15 @@ const Home: React.FC<HomeProps> = ({ lang, onViewChange }) => {
          </div>
       </div>
 
-      {/* Flash Deals - Horizontal Scroll */}
-      <div className="pl-4 mb-10 animate-fade-in-up delay-300">
-        <div className="flex items-center gap-2 mb-4">
+      {/* Flash Deals - Horizontal Scroll - Fixed Padding */}
+      <div className="mb-10 animate-fade-in-up delay-300">
+        <div className="flex items-center gap-2 mb-4 px-4">
           <div className="bg-gold/10 p-1.5 rounded-lg">
              <span className="text-gold animate-pulse text-xl">⚡</span>
           </div>
           <h3 className="font-bold text-xl text-charcoal dark:text-white tracking-tight">{UI_TEXT.flashDeals[lang]}</h3>
         </div>
-        <div className="flex gap-5 overflow-x-auto no-scrollbar pr-4 pb-8">
+        <div className="flex gap-5 overflow-x-auto no-scrollbar px-4 pb-8">
           {MOCK_DEALS.map(deal => (
             <DealCard key={deal.id} deal={deal} />
           ))}
@@ -111,7 +117,7 @@ const Home: React.FC<HomeProps> = ({ lang, onViewChange }) => {
         <div className="grid grid-cols-2 gap-4">
           {listings.slice(0, 4).map((listing, idx) => (
             <div key={listing.id} style={{ animationDelay: `${idx * 100}ms` }} className="animate-fade-in-up">
-              <ListingCard listing={listing} onClick={() => {}} lang={lang} />
+              <ListingCard listing={listing} onClick={() => setSelectedListingId(listing.id)} lang={lang} />
             </div>
           ))}
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Language } from './types';
 import Navbar from './components/Navbar';
@@ -10,6 +11,8 @@ import More from './pages/More';
 import FundiProfile from './pages/FundiProfile';
 import StayProfile from './pages/StayProfile';
 import UserProfilePage from './pages/UserProfile.tsx';
+import ListingDetail from './pages/ListingDetail';
+import Wishlist from './pages/Wishlist';
 
 function App() {
   const [lang, setLang] = useState<Language>('en');
@@ -31,13 +34,15 @@ function App() {
     if (view === 'fundi_profile') return <FundiProfile id={selectedId} lang={lang} onBack={() => setView('fundis')} />;
     if (view === 'stay_profile') return <StayProfile id={selectedId} lang={lang} onBack={() => setView('stays')} />;
     if (view === 'user_profile') return <UserProfilePage onBack={() => setView('home')} />;
+    if (view === 'listing_detail') return <ListingDetail id={selectedId} lang={lang} onBack={() => setView('home')} />;
+    if (view === 'wishlist') return <Wishlist lang={lang} onListingClick={(id) => { setSelectedId(id); setView('listing_detail'); }} />;
 
     switch (view) {
       case 'home': return <Home lang={lang} onViewChange={setView} />;
       case 'fundis': return <FundiFinder lang={lang} onServiceClick={(id) => { setSelectedId(id); setView('fundi_profile'); }} />;
       case 'stays': return <Stays onStayClick={(id) => { setSelectedId(id); setView('stay_profile'); }} />;
       case 'market': return <Marketplace />;
-      case 'more': return <More lang={lang} />;
+      case 'more': return <More lang={lang} onNavigate={setView} />;
       default: return <Home lang={lang} onViewChange={setView} />;
     }
   };
@@ -48,8 +53,8 @@ function App() {
         lang={lang} 
         setLang={setLang} 
         goHome={() => setView('home')} 
-        showBack={view.includes('_profile')}
-        onBack={() => setView('home')} // Fallback
+        showBack={view.includes('_profile') || view === 'listing_detail' || view === 'wishlist'}
+        onBack={() => setView('home')} // Fallback logic handled by specific renderers usually
         title={view.replace('_', ' ').charAt(0).toUpperCase() + view.slice(1).replace('_', ' ')}
         darkMode={darkMode}
         toggleDarkMode={toggleDarkMode}
