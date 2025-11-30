@@ -107,6 +107,45 @@ export const MOCK_STAYS: Stay[] = [
     whatsapp: '254700000000',
     is_verified: true,
     description: 'Immersive nature experience in the trees.'
+  },
+  {
+    id: 'st4',
+    title: 'Osteria Malindi',
+    type: 'Restaurant',
+    location: 'Silversands',
+    price_per_night: 3000, // Average meal for 2
+    rating: 4.8,
+    image_url: 'https://picsum.photos/600/400?random=104',
+    features: ['Italian Cuisine', 'Ocean View', 'Romantic'],
+    whatsapp: '254700000000',
+    is_verified: true,
+    description: 'The finest Italian dining experience in Malindi right on the beach.'
+  },
+  {
+    id: 'st5',
+    title: 'Baby Marrow',
+    type: 'Restaurant',
+    location: 'Malindi Town',
+    price_per_night: 2500,
+    rating: 4.6,
+    image_url: 'https://picsum.photos/600/400?random=105',
+    features: ['Art Gallery', 'Fusion Food', 'Live Music'],
+    whatsapp: '254700000000',
+    is_verified: true,
+    description: 'A unique blend of art and food in a cozy garden setting.'
+  },
+  {
+    id: 'st6',
+    title: 'Karen Blixen House',
+    type: 'Villa',
+    location: 'Malindi',
+    price_per_night: 25000,
+    rating: 4.9,
+    image_url: 'https://picsum.photos/600/400?random=106',
+    features: ['Historical', 'Large Garden', 'Full Staff'],
+    whatsapp: '254700000000',
+    is_verified: true,
+    description: 'Experience history in this magnificent colonial style villa.'
   }
 ];
 

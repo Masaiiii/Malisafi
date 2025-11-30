@@ -93,9 +93,9 @@ export interface Event {
 export interface Stay {
   id: string;
   title: string;
-  type: 'Villa' | 'Apartment' | 'Guest House';
+  type: 'Villa' | 'Apartment' | 'Guest House' | 'Restaurant' | 'Hotel';
   location: string;
-  price_per_night: number;
+  price_per_night: number; // For restaurants, this could be "Average Price"
   rating: number;
   image_url: string;
   features: string[];
