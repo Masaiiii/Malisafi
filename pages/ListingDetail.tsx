@@ -30,68 +30,85 @@ const ListingDetail: React.FC<ListingDetailProps> = ({ id, lang, onBack }) => {
 
   return (
     <div className="fixed inset-0 bg-white z-40 overflow-y-auto pb-safe">
-      <div className="max-w-xl mx-auto min-h-screen flex flex-col">
-        {/* Header Image */}
-        <div className="relative aspect-[4/3] bg-gray-100">
+      <div className="max-w-5xl mx-auto min-h-screen flex flex-col md:flex-row md:items-start md:p-8 md:gap-8">
+        
+        {/* Mobile Header / Back Button */}
+        <div className="md:hidden absolute top-4 left-4 z-10">
           <button 
             onClick={onBack}
-            className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur p-2 rounded-full shadow-lg"
+            className="bg-white/80 backdrop-blur p-2 rounded-full shadow-lg"
           >
             ←
           </button>
-          <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
         </div>
 
-        {/* Content */}
-        <div className="p-4 flex-1">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h1 className="text-xl font-bold font-heading text-gray-900">{item.title}</h1>
-              <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
-                📍 {item.location} • <span className="text-xs">{new Date(item.created_at).toLocaleDateString()}</span>
+        {/* Desktop Back Button */}
+        <button 
+          onClick={onBack}
+          className="hidden md:block absolute top-8 left-8 bg-slate-100 hover:bg-slate-200 p-3 rounded-full transition-colors"
+        >
+          ←
+        </button>
+
+        {/* Image Section */}
+        <div className="w-full md:w-1/2 md:rounded-3xl overflow-hidden shadow-none md:shadow-xl bg-slate-100 aspect-square md:aspect-auto md:h-[500px] relative">
+           <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+           <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+             {item.category}
+           </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-4 md:p-0 flex-1 flex flex-col h-full justify-between">
+          <div>
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold font-heading text-slate-900">{item.title}</h1>
+                <p className="text-slate-500 text-sm flex items-center gap-1 mt-2">
+                  📍 {item.location} • <span className="text-xs">{new Date(item.created_at).toLocaleDateString()}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="text-3xl font-bold text-ocean mb-6">KSh {item.price.toLocaleString()}</div>
+
+            <div className="my-6 border-t border-b border-slate-100 py-4 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-sunset/10 flex items-center justify-center text-sunset font-bold text-xl border border-sunset/20">
+                {item.user_name ? item.user_name[0] : 'U'}
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-slate-900 text-lg">{item.user_name || 'Mali Safi User'}</p>
+                {item.is_verified && (
+                  <p className="text-verified text-sm flex items-center gap-1 font-medium">
+                    ✓ {UI_TEXT.verifiedSeller[lang]}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="font-bold text-slate-900 mb-3 text-lg">{UI_TEXT.description[lang]}</h3>
+              <p className="text-slate-600 leading-relaxed">
+                {item.description}
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-ocean font-bold text-xl">KSh {item.price.toLocaleString()}</p>
+
+            <div className="bg-blue-50 p-5 rounded-xl mb-6 border border-blue-100">
+              <p className="text-deepBlue text-sm font-medium flex gap-2">
+                <span>🛡️</span> {UI_TEXT.safetyTip[lang]}
+              </p>
             </div>
           </div>
 
-          <div className="my-4 border-t border-b border-gray-100 py-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-sunset/20 flex items-center justify-center text-sunset font-bold">
-              {item.user_name ? item.user_name[0] : 'U'}
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-gray-900">{item.user_name || 'Mali Safi User'}</p>
-              {item.is_verified && (
-                <p className="text-verified text-xs flex items-center gap-1">
-                  ✓ {UI_TEXT.verifiedSeller[lang]}
-                </p>
-              )}
-            </div>
+          {/* Footer Actions */}
+          <div className="sticky md:static bottom-0 bg-white md:bg-transparent p-4 md:p-0 border-t md:border-0 border-slate-100 flex gap-4 pb-safe">
+             <button className="px-6 py-3 border border-slate-200 rounded-xl text-red-500 font-bold text-sm hover:bg-red-50 transition-colors">
+               Report
+             </button>
+             <Button variant="whatsapp" fullWidth onClick={handleWhatsApp} className="text-lg">
+               Chat on WhatsApp
+             </Button>
           </div>
-
-          <div className="mb-6">
-            <h3 className="font-medium text-gray-900 mb-2">{UI_TEXT.description[lang]}</h3>
-            <p className="text-gray-600 leading-relaxed text-sm">
-              {item.description}
-            </p>
-          </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg mb-6">
-            <p className="text-deepBlue text-xs font-medium text-center">
-              🛡️ {UI_TEXT.safetyTip[lang]}
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="sticky bottom-0 bg-white p-4 border-t border-gray-100 flex gap-3 pb-safe">
-           <button className="p-3 border border-gray-200 rounded-lg text-red-500 font-medium text-xs w-1/4 flex flex-col items-center justify-center">
-             ⚠️ Report
-           </button>
-           <Button variant="whatsapp" fullWidth onClick={handleWhatsApp} className="flex-1">
-             <span className="text-xl">💬</span> WhatsApp
-           </Button>
         </div>
       </div>
     </div>

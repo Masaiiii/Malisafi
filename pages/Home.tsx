@@ -1,200 +1,154 @@
 import React, { useEffect, useState } from 'react';
-import { CATEGORIES, UI_TEXT } from '../constants';
-import { Listing, CategoryId, Language, Store } from '../types';
-import { fetchListings, fetchStores } from '../services/dataService';
-import ListingCard from '../components/ListingCard';
+import { UI_TEXT, CATEGORIES } from '../constants';
+import { Service, UtilityStatus, Language, Store } from '../types';
+import { fetchUtilityStatus, fetchServices, fetchStores } from '../services/dataService';
+import UtilityWidget from '../components/UtilityWidget';
 import StoreCard from '../components/StoreCard';
 
 interface HomeProps {
   lang: Language;
-  onListingClick: (id: string) => void;
+  onViewChange: (view: string) => void;
   onStoreClick: (id: string) => void;
-  activeCategory: CategoryId;
-  setActiveCategory: (cat: CategoryId) => void;
 }
 
-const Home: React.FC<HomeProps> = ({ lang, onListingClick, onStoreClick, activeCategory, setActiveCategory }) => {
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [stores, setStores] = useState<Store[]>([]);
+const Home: React.FC<HomeProps> = ({ lang, onViewChange, onStoreClick }) => {
+  const [utilities, setUtilities] = useState<UtilityStatus[]>([]);
+  const [trustedPros, setTrustedPros] = useState<Service[]>([]);
+  const [popularStores, setPopularStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [listingsData, storesData] = await Promise.all([
-        fetchListings(activeCategory),
+      const [utilData, prosData, storesData] = await Promise.all([
+        fetchUtilityStatus(),
+        fetchServices(),
         fetchStores()
       ]);
-      setListings(listingsData);
-      setStores(storesData);
+      setUtilities(utilData);
+      setTrustedPros(prosData.filter(s => s.is_verified).slice(0, 5));
+      setPopularStores(storesData);
       setLoading(false);
     };
     load();
-  }, [activeCategory]);
-
-  // Separate listings with expires_at (Quick Gigs)
-  const quickGigs = listings.filter(l => l.expires_at && new Date(l.expires_at) > new Date());
-  // Standard listings exclude quick gigs unless we are viewing 'gigs' or 'all' specifically wanting them
-  const standardListings = listings.filter(l => !l.expires_at);
+  }, []);
 
   return (
     <div className="pb-24">
       {/* Hero Section */}
-      <div className="bg-ocean px-4 py-6 text-white mb-6 rounded-b-3xl shadow-xl shadow-ocean/20">
-        <h2 className="text-2xl font-bold font-heading mb-1 tracking-tight">{UI_TEXT.welcome[lang]}</h2>
-        <p className="text-white/90 text-sm mb-4 font-light">{UI_TEXT.subtitle[lang]}</p>
+      <div className="bg-ocean pb-10 pt-6 px-4 rounded-b-[2.5rem] shadow-glow mb-8 relative overflow-hidden">
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-deepBlue/20 rounded-full -ml-10 -mb-10 blur-xl"></div>
         
-        {/* Search Bar - Visual Only for this demo */}
-        <div className="relative">
-          <input 
-            type="text" 
-            placeholder={UI_TEXT.searchPlaceholder[lang]}
-            className="w-full pl-10 pr-4 py-3 rounded-full text-gray-900 text-sm focus:outline-none focus:ring-4 focus:ring-sunset/30 shadow-lg placeholder:text-gray-400"
-          />
-          <span className="absolute left-3 top-3 text-gray-400">🔍</span>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex justify-between items-start mb-6">
+            <div className="text-white">
+              <h2 className="text-2xl font-bold font-heading mb-1">{UI_TEXT.welcome[lang]}</h2>
+              <p className="text-blue-100 text-sm opacity-90">Find trusted services in Malindi.</p>
+            </div>
+          </div>
+
+          {/* Search Bar Floating */}
+          <div className="relative group max-w-2xl mx-auto">
+            <input 
+              type="text" 
+              placeholder={UI_TEXT.searchPlaceholder[lang]}
+              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white text-slate-800 shadow-xl shadow-ocean/20 border-0 focus:ring-4 focus:ring-ocean/20 outline-none transition-all placeholder:text-slate-400 font-medium text-sm"
+            />
+            <span className="absolute left-4 top-4 text-xl text-ocean">🔍</span>
+          </div>
+          
+          <div className="mt-6 max-w-2xl mx-auto">
+             <UtilityWidget utilities={utilities} />
+          </div>
         </div>
       </div>
 
-      {/* Quick Gigs Section (24h) */}
-      {(activeCategory === 'all' || activeCategory === 'gigs') && (
-        <div className="px-4 mb-6 border-b border-gray-100 pb-6">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-md font-bold text-gray-800 flex items-center gap-1">
-              {UI_TEXT.quickGigsHeader[lang]}
-            </h3>
-            {activeCategory !== 'gigs' && (
-              <button 
-                onClick={() => setActiveCategory('gigs')} 
-                className="text-ocean text-xs font-semibold hover:underline"
-              >
-                {lang === 'en' ? 'See all' : 'Ona zote'}
-              </button>
-            )}
-          </div>
-          
-          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-            {/* Post Quick Gig Button */}
-            <div className="min-w-[140px] h-[160px] bg-gradient-to-br from-sunset to-red-500 rounded-xl flex flex-col items-center justify-center text-white shadow-lg p-3 text-center cursor-pointer shrink-0" onClick={() => { /* Trigger Post with quick gig param in real app */ }}>
-              <span className="text-3xl mb-1">⚡</span>
-              <span className="font-bold text-sm leading-tight">Post Quick Gig</span>
-              <span className="text-[10px] opacity-80 mt-1">Expires in 24h</span>
-            </div>
-
-            {quickGigs.map(gig => (
-              <div 
-                key={gig.id}
-                onClick={() => onListingClick(gig.id)}
-                className="min-w-[200px] h-[160px] bg-white rounded-xl border-2 border-sunset/10 p-3 shadow-sm flex flex-col justify-between cursor-pointer shrink-0 hover:border-sunset transition-colors"
-              >
-                <div>
-                  <div className="flex justify-between items-start">
-                    <span className="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded">24h</span>
-                    <span className="text-xs font-bold text-ocean">KSh {gig.price}</span>
-                  </div>
-                  <h4 className="font-bold text-gray-800 text-sm mt-2 line-clamp-2">{gig.title}</h4>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{gig.description}</p>
-                </div>
-                <div className="text-[10px] text-gray-400 flex items-center gap-1 mt-2">
-                  📍 {gig.location}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Categories */}
-      <div className="px-4 mb-6">
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-          <button
-            onClick={() => setActiveCategory('all')}
-            className={`flex flex-col items-center min-w-[70px] group transition-all`}
-          >
-            <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-1 transition-all ${activeCategory === 'all' ? 'bg-ocean text-white shadow-lg shadow-ocean/30 scale-110' : 'bg-white border border-gray-100 text-gray-400 group-hover:bg-gray-50'}`}>
-              ♾️
-            </div>
-            <span className={`text-xs font-medium ${activeCategory === 'all' ? 'text-ocean' : 'text-gray-500'}`}>All</span>
-          </button>
-
-          {CATEGORIES.map((cat) => (
-            <button
+      <div className="max-w-7xl mx-auto px-4 space-y-10">
+        {/* Categories Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {CATEGORIES.map(cat => (
+            <button 
               key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className="flex flex-col items-center min-w-[70px] group transition-all"
+              onClick={() => onViewChange(cat.id === 'fundis' ? 'fundis' : cat.id === 'emergency' ? 'emergency' : 'market')}
+              className="group bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-lg hover:border-ocean/30 transition-all duration-300 flex flex-col items-center gap-3 text-center"
             >
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl mb-1 transition-all ${activeCategory === cat.id ? 'bg-ocean text-white shadow-lg shadow-ocean/30 scale-110' : 'bg-white border border-gray-100 text-gray-400 group-hover:bg-gray-50'}`}>
+              <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center text-3xl group-hover:scale-110 group-hover:bg-ocean/10 transition-transform">
                 {cat.icon}
               </div>
-              <span className={`text-xs font-medium whitespace-nowrap ${activeCategory === cat.id ? 'text-ocean' : 'text-gray-500'}`}>
+              <span className="font-bold text-slate-700 group-hover:text-ocean transition-colors">
                 {lang === 'en' ? cat.label.en : cat.label.sw}
               </span>
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Shops Section */}
-      {(activeCategory === 'all' || activeCategory === 'market') && (
-        <div className="px-4 mb-8">
-           <div className="flex justify-between items-center mb-3">
-             <h3 className="text-md font-bold text-gray-800">{UI_TEXT.shopsHeader[lang]}</h3>
-           </div>
-           
-           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-             {/* Open Shop CTA */}
-             <div className="min-w-[140px] w-[140px] flex flex-col items-center justify-center gap-2 cursor-pointer group bg-ocean/5 rounded-xl border border-dashed border-ocean">
-                <div className="w-12 h-12 rounded-full bg-ocean/10 flex items-center justify-center text-xl text-ocean mb-1">
-                  🏪
-                </div>
-                <div className="text-center">
-                  <h4 className="font-bold text-ocean text-sm">{UI_TEXT.openShop[lang]}</h4>
-                  <span className="text-[10px] text-gray-500">Free forever</span>
-                </div>
+        {/* Featured / Verified Promo */}
+        <div className="bg-gradient-to-r from-deepBlue to-ocean text-white p-6 rounded-2xl shadow-lg relative overflow-hidden flex items-center justify-between">
+           <div className="relative z-10 max-w-lg">
+             <div className="flex items-center gap-2 mb-2">
+               <span className="bg-white/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Safety First</span>
              </div>
-
-             {stores.map(store => (
-               <StoreCard 
-                 key={store.id} 
-                 store={store} 
-                 onClick={() => onStoreClick(store.id)} 
-               />
-             ))}
+             <h3 className="text-xl font-bold mb-2">Verified Fundis Only</h3>
+             <p className="text-blue-100 text-sm mb-4 max-w-xs">We check IDs and past work so you don't have to. Look for the Blue Tick.</p>
+             <button onClick={() => onViewChange('fundis')} className="bg-white text-ocean px-5 py-2 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors">
+               Find a Pro
+             </button>
            </div>
-        </div>
-      )}
-
-      {/* Main Listings Grid */}
-      <div className="px-4 max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold text-gray-800">
-            {activeCategory === 'all' ? UI_TEXT.recentListings[lang] : (lang === 'en' ? CATEGORIES.find(c => c.id === activeCategory)?.label.en : CATEGORIES.find(c => c.id === activeCategory)?.label.sw)}
-          </h3>
+           <div className="text-[8rem] absolute -right-4 -bottom-8 opacity-20">🛡️</div>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 animate-pulse">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="aspect-[4/3] bg-gray-200 rounded-xl"></div>
+        {/* Trusted Pros */}
+        <div>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+              <span className="text-ocean">★</span> {lang === 'en' ? 'Trusted Pros' : 'Mafundi Bora'}
+            </h3>
+            <button onClick={() => onViewChange('fundis')} className="text-ocean text-sm font-semibold hover:underline">See All</button>
+          </div>
+          
+          {/* Responsive scrolling or grid */}
+          <div className="flex md:grid md:grid-cols-5 gap-4 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+            {trustedPros.map(pro => (
+              <div 
+                key={pro.id}
+                className="min-w-[160px] md:min-w-0 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className="relative">
+                  <img src={pro.image_url} className="w-16 h-16 rounded-full bg-slate-100 mb-3 object-cover border-2 border-white shadow-sm" />
+                  <div className="absolute bottom-0 right-0 bg-verified text-white text-[10px] p-0.5 rounded-full border border-white">✓</div>
+                </div>
+                <h4 className="font-bold text-sm text-slate-800 line-clamp-1">{pro.name}</h4>
+                <p className="text-xs text-slate-500 mb-2">{pro.profession}</p>
+                <div className="mt-auto bg-orange-50 text-orange-600 px-2 py-1 rounded-md text-xs font-bold">
+                  ★ {pro.rating_avg}
+                </div>
+              </div>
             ))}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {(activeCategory === 'gigs' ? quickGigs : standardListings).map(item => (
-              <ListingCard 
-                key={item.id} 
-                listing={item} 
-                lang={lang}
-                onClick={() => onListingClick(item.id)}
-              />
-            ))}
+        </div>
+
+         {/* Popular Shops */}
+         <div>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
+              <span className="text-ocean">🛍️</span> {UI_TEXT.shops[lang]}
+            </h3>
           </div>
-        )}
-        
-        {!loading && listings.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            <p>Hakuna bidhaa kwa sasa. (No items yet)</p>
+          
+          <div className="flex md:grid md:grid-cols-6 gap-4 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+            {popularStores.length > 0 ? (
+              popularStores.map(store => (
+                <div key={store.id} className="min-w-[140px] md:min-w-0">
+                   <StoreCard store={store} onClick={() => onStoreClick(store.id)} />
+                </div>
+              ))
+            ) : (
+               <div className="text-xs text-slate-400 pl-4">No shops found.</div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mali Safi | Malindi Marketplace</title>
-    <meta name="description" content="Mali Safi. Bei Safi. Deal Safi. The #1 Marketplace for Malindi and Watamu." />
+    <title>Mali Safi | Malindi Super App</title>
+    <meta name="description" content="Mali Safi. The trusted marketplace for Malindi. Fundis, Goods, and Services." />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,19 +13,21 @@
         theme: {
           extend: {
             colors: {
-              ocean: '#0D9488',    /* Teal-600: Modern, trustworthy, coastal */
-              sunset: '#F97316',   /* Orange-500: Energetic, urgent, warm */
-              deepBlue: '#134E4A', /* Teal-900: Deep contrast */
-              verified: '#10B981', /* Emerald-500 */
-              bgLight: '#F0FDFA',  /* Teal-50: Very light fresh background */
+              ocean: '#0ea5e9',    /* Sky 500: Brighter, more modern blue */
+              sand: '#f8fafc',     /* Slate 50: Crisp white/grey background */
+              sunset: '#f97316',   /* Orange 500: Vivid CTA */
+              signalRed: '#ef4444',/* Red 500 */
+              verified: '#10b981', /* Emerald 500 */
+              deepBlue: '#0369a1', /* Sky 700 */
               whatsapp: '#25D366',
             },
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              heading: ['Rubik', 'sans-serif'],
+              sans: ['Poppins', 'sans-serif'],
+              heading: ['Poppins', 'sans-serif'],
             },
-            animation: {
-              'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            boxShadow: {
+              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              'glow': '0 0 15px rgba(14, 165, 233, 0.3)',
             }
           }
         }
@@ -35,15 +37,13 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Rubik:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
       body {
-        background-color: #F0FDFA;
-        font-family: 'Inter', sans-serif;
-      }
-      h1, h2, h3, h4, h5, h6 {
-        font-family: 'Rubik', sans-serif;
+        background-color: #f8fafc;
+        font-family: 'Poppins', sans-serif;
+        color: #1e293b;
       }
       /* Hide scrollbar for horizontal scrolling areas */
       .no-scrollbar::-webkit-scrollbar {
@@ -52,6 +52,9 @@
       .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 20px);
       }
     </style>
   <script type="importmap">

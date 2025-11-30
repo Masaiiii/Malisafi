@@ -4,35 +4,36 @@ import { Language } from '../types';
 interface NavbarProps {
   lang: Language;
   setLang: (lang: Language) => void;
-  onPostClick: () => void;
   goHome: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ lang, setLang, onPostClick, goHome }) => {
+const Navbar: React.FC<NavbarProps> = ({ lang, setLang, goHome }) => {
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 py-3">
-      <div className="max-w-4xl mx-auto flex justify-between items-center">
-        <div onClick={goHome} className="cursor-pointer flex flex-col">
-          <h1 className="text-2xl font-bold font-heading text-ocean tracking-tight">
-            MALI<span className="text-sunset">SAFI</span>
-          </h1>
-          <span className="text-[10px] text-gray-500 uppercase tracking-widest -mt-1">Malindi</span>
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 shadow-sm">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div onClick={goHome} className="cursor-pointer flex items-center gap-2 group">
+          <div className="w-9 h-9 bg-gradient-to-br from-ocean to-deepBlue rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-ocean/30 group-hover:scale-105 transition-transform">
+            M
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-extrabold font-heading text-slate-800 tracking-tight leading-none group-hover:text-ocean transition-colors">
+              MALI<span className="text-ocean">SAFI</span>
+            </h1>
+            <span className="text-[9px] text-slate-400 uppercase tracking-[0.2em] font-medium">Malindi</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button 
             onClick={() => setLang(lang === 'en' ? 'sw' : 'en')}
-            className="text-xs font-bold bg-gray-100 px-2 py-1 rounded text-gray-600 hover:bg-gray-200"
+            className="text-xs font-bold bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors"
           >
             {lang === 'en' ? 'SW' : 'EN'}
           </button>
           
-          <button 
-            onClick={onPostClick}
-            className="hidden sm:block bg-ocean text-white px-4 py-2 rounded-full font-medium text-sm hover:bg-deepBlue transition-colors shadow-md shadow-ocean/20"
-          >
-            + {lang === 'en' ? 'Post' : 'Uza'}
-          </button>
+          <div className="w-9 h-9 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white shadow-sm cursor-pointer hover:ring-ocean transition-all">
+             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User" />
+          </div>
         </div>
       </div>
     </nav>
