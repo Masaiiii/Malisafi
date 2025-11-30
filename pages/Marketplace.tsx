@@ -3,9 +3,13 @@ import React, { useState } from 'react';
 import { MOCK_STORES } from '../constants';
 import StoreCard from '../components/StoreCard';
 
+interface MarketplaceProps {
+  onStoreClick: (id: string) => void;
+}
+
 const CATEGORIES = ['All', 'Electronics', 'Furniture', 'Fashion', 'Cars', 'Food'];
 
-const Marketplace: React.FC = () => {
+const Marketplace: React.FC<MarketplaceProps> = ({ onStoreClick }) => {
   const [filter, setFilter] = useState('All');
 
   return (
@@ -33,7 +37,7 @@ const Marketplace: React.FC = () => {
         <div className="grid grid-cols-1 gap-5">
           {MOCK_STORES.map((store, idx) => (
             <div key={store.id} style={{ animationDelay: `${idx * 100}ms` }}>
-              <StoreCard store={store} onClick={() => {}} />
+              <StoreCard store={store} onClick={() => onStoreClick(store.id)} />
             </div>
           ))}
         </div>
