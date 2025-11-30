@@ -1,87 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from './types';
 import Navbar from './components/Navbar';
 import BottomNav from './components/BottomNav';
 import Home from './pages/Home';
-import PostItem from './pages/PostItem';
-import ListingDetail from './pages/ListingDetail';
-import Emergency from './pages/Emergency';
 import FundiFinder from './pages/FundiFinder';
-import StoreProfile from './pages/StoreProfile';
-import { fetchListings } from './services/dataService';
-import ListingCard from './components/ListingCard';
+import Stays from './pages/Stays';
+import Marketplace from './pages/Marketplace';
+import More from './pages/More';
+import FundiProfile from './pages/FundiProfile';
+import StayProfile from './pages/StayProfile';
+import UserProfilePage from './pages/UserProfile.tsx';
 
 function App() {
   const [lang, setLang] = useState<Language>('en');
   const [view, setView] = useState<string>('home');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
-  const [listings, setListings] = useState<any[]>([]);
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [darkMode, setDarkMode] = useState(false);
 
-  // Responsive Marketplace View
-  const Marketplace = () => {
-    React.useEffect(() => {
-      fetchListings().then(setListings);
-    }, []);
-    return (
-      <div className="px-4 py-6 pb-24 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold font-heading text-slate-800">
-            {lang === 'en' ? 'Marketplace' : 'Soko'}
-          </h2>
-          <div className="bg-red-50 text-red-600 px-4 py-2 rounded-full text-xs font-bold border border-red-100 flex items-center gap-2">
-             <span>🛡️</span> Never send money in advance
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-          {listings.map(l => (
-             <ListingCard key={l.id} listing={l} lang={lang} onClick={() => { setSelectedId(l.id); setView('details'); }} />
-          ))}
-        </div>
-      </div>
-    );
-  };
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
-  const handleStoreClick = (id: string) => {
-    setSelectedStoreId(id);
-    setView('store');
-  };
+  const toggleDarkMode = () => setDarkMode(!darkMode);
 
   const renderContent = () => {
+    if (view === 'fundi_profile') return <FundiProfile id={selectedId} lang={lang} onBack={() => setView('fundis')} />;
+    if (view === 'stay_profile') return <StayProfile id={selectedId} lang={lang} onBack={() => setView('stays')} />;
+    if (view === 'user_profile') return <UserProfilePage onBack={() => setView('home')} />;
+
     switch (view) {
-      case 'home':
-        return <Home lang={lang} onViewChange={setView} onStoreClick={handleStoreClick} />;
-      case 'fundis':
-        return <FundiFinder lang={lang} />;
-      case 'market':
-        return <Marketplace />;
-      case 'post':
-        return <PostItem lang={lang} onClose={() => setView('home')} />;
-      case 'emergency':
-        return <Emergency lang={lang} />;
-      case 'details':
-        if (!selectedId) return null;
-        return <ListingDetail id={selectedId} lang={lang} onBack={() => setView('market')} />;
-      case 'store':
-        if (!selectedStoreId) return null;
-        return (
-          <StoreProfile 
-            storeId={selectedStoreId} 
-            lang={lang} 
-            onBack={() => setView('home')} 
-            onListingClick={(id) => { setSelectedId(id); setView('details'); }}
-          />
-        );
-      default:
-        return <Home lang={lang} onViewChange={setView} onStoreClick={handleStoreClick} />;
+      case 'home': return <Home lang={lang} onViewChange={setView} />;
+      case 'fundis': return <FundiFinder lang={lang} onServiceClick={(id) => { setSelectedId(id); setView('fundi_profile'); }} />;
+      case 'stays': return <Stays onStayClick={(id) => { setSelectedId(id); setView('stay_profile'); }} />;
+      case 'market': return <Marketplace />;
+      case 'more': return <More lang={lang} />;
+      default: return <Home lang={lang} onViewChange={setView} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-safe selection:bg-ocean/20">
-      <Navbar lang={lang} setLang={setLang} goHome={() => setView('home')} />
-      <main className="pt-2">
+    <div className="min-h-screen bg-white dark:bg-navy text-charcoal dark:text-gray-100 font-sans selection:bg-teal-100 selection:text-teal-900 transition-colors duration-300">
+      <Navbar 
+        lang={lang} 
+        setLang={setLang} 
+        goHome={() => setView('home')} 
+        showBack={view.includes('_profile')}
+        onBack={() => setView('home')} // Fallback
+        title={view.replace('_', ' ').charAt(0).toUpperCase() + view.slice(1).replace('_', ' ')}
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        onProfileClick={() => setView('user_profile')}
+      />
+      <main className="max-w-xl mx-auto min-h-screen bg-white dark:bg-navy shadow-2xl dark:shadow-none shadow-gray-100">
         {renderContent()}
       </main>
       <BottomNav currentView={view} setView={setView} lang={lang} />

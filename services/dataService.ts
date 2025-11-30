@@ -1,6 +1,6 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { Listing, Service, UtilityStatus, Store } from '../types';
-import { MOCK_LISTINGS, MOCK_SERVICES, MOCK_UTILITIES, MOCK_STORES } from '../constants';
+import { Listing, Service, UtilityStatus, Store, Stay, UserProfile } from '../types';
+import { MOCK_LISTINGS, MOCK_SERVICES, MOCK_UTILITIES, MOCK_STORES, MOCK_STAYS, MOCK_USER } from '../constants';
 
 let localListings = [...MOCK_LISTINGS];
 
@@ -28,6 +28,10 @@ export const fetchServices = async (profession?: string): Promise<Service[]> => 
   return MOCK_SERVICES;
 };
 
+export const fetchServiceById = async (id: string): Promise<Service | undefined> => {
+    return MOCK_SERVICES.find(s => s.id === id);
+}
+
 export const fetchListings = async (category: string = 'all'): Promise<Listing[]> => {
   if (isSupabaseConfigured && supabase) {
     let query = supabase.from('listings').select('*').order('created_at', { ascending: false });
@@ -36,6 +40,17 @@ export const fetchListings = async (category: string = 'all'): Promise<Listing[]
     return data as Listing[] || localListings;
   }
   return localListings;
+};
+
+export const fetchUserListings = async (userId: string): Promise<Listing[]> => {
+  if (isSupabaseConfigured && supabase) {
+    const { data } = await supabase.from('listings').select('*').eq('seller_id', userId);
+    return data as Listing[] || localListings.filter(l => l.seller_id === userId);
+  }
+  // For mock, we assume 'me' is the current user or check specific IDs if needed
+  // In MOCK_LISTINGS, we don't strictly have seller_id set on all, so we might return empty or specific ones.
+  // We will ensure createListing adds the ID.
+  return localListings.filter(l => l.seller_id === userId || l.user_name === 'Felix Otieno'); // Fallback for mock matching
 };
 
 export const createListing = async (listing: Partial<Listing>): Promise<Listing | null> => {
@@ -52,11 +67,26 @@ export const createListing = async (listing: Partial<Listing>): Promise<Listing 
     is_featured: false,
     views: 0,
     created_at: new Date().toISOString(),
+    seller_id: 'me', // Hardcoded for current user mock
+    user_name: MOCK_USER.name,
     ...listing
   } as Listing;
 
   localListings = [newListing, ...localListings];
   return newListing;
+};
+
+export const updateListing = async (listing: Listing): Promise<Listing | null> => {
+  if (isSupabaseConfigured && supabase) {
+    // Supabase update logic would go here
+  }
+  
+  const index = localListings.findIndex(l => l.id === listing.id);
+  if (index !== -1) {
+    localListings[index] = { ...localListings[index], ...listing };
+    return localListings[index];
+  }
+  return null;
 };
 
 export const getListingById = async (id: string): Promise<Listing | undefined> => {
@@ -86,3 +116,11 @@ export const fetchListingsByStore = async (id: string): Promise<Listing[]> => {
   }
   return localListings.filter(l => l.store_id === id);
 };
+
+export const fetchStayById = async (id: string): Promise<Stay | undefined> => {
+    return MOCK_STAYS.find(s => s.id === id);
+}
+
+export const fetchUserProfile = async (): Promise<UserProfile> => {
+    return MOCK_USER;
+}

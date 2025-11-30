@@ -1,33 +1,78 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mali Safi | Malindi Super App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Mali Safi | Coastal Luxury Super App</title>
     <meta name="description" content="Mali Safi. The trusted marketplace for Malindi. Fundis, Goods, and Services." />
+    <meta name="theme-color" content="#0D9488" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
-              ocean: '#0ea5e9',    /* Sky 500: Brighter, more modern blue */
-              sand: '#f8fafc',     /* Slate 50: Crisp white/grey background */
-              sunset: '#f97316',   /* Orange 500: Vivid CTA */
-              signalRed: '#ef4444',/* Red 500 */
-              verified: '#10b981', /* Emerald 500 */
-              deepBlue: '#0369a1', /* Sky 700 */
-              whatsapp: '#25D366',
+              teal: {
+                DEFAULT: '#0D9488', // Primary Ocean Teal
+                50: '#F0FDFA',
+                100: '#CCFBF1',
+                500: '#14B8A6',
+                600: '#0D9488',
+                800: '#115E59',
+              },
+              gold: {
+                DEFAULT: '#F59E0B', // Accent Sunset Gold
+                50: '#FFFBEB',
+                100: '#FEF3C7',
+                400: '#FBBF24',
+                500: '#F59E0B',
+                600: '#D97706',
+              },
+              verified: '#10B981', // Emerald
+              charcoal: '#1F2937', // Text Dark
+              navy: '#0F172A',     // Dark Mode Background
+              surface: '#F8FAFC',  // Light Grey Cards
+              pure: '#FFFFFF',     // Background
+              coral: '#FF6B6B',
             },
             fontFamily: {
-              sans: ['Poppins', 'sans-serif'],
+              sans: ['Inter', 'sans-serif'],
               heading: ['Poppins', 'sans-serif'],
             },
             boxShadow: {
-              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              'glow': '0 0 15px rgba(14, 165, 233, 0.3)',
+              'soft': '0 10px 40px -10px rgba(0, 0, 0, 0.08)',
+              'golden': '0 10px 30px -5px rgba(245, 158, 11, 0.4)',
+              'ocean': '0 10px 30px -5px rgba(13, 148, 136, 0.4)',
+              'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+            },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 6s ease-in-out infinite',
+              'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+              'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+              'slide-up': 'slideUp 0.4s ease-out forwards',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              pop: {
+                '0%': { transform: 'scale(0.9)' },
+                '100%': { transform: 'scale(1)' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(100%)' },
+                '100%': { transform: 'translateY(0)' },
+              }
             }
           }
         }
@@ -37,15 +82,25 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
       body {
-        background-color: #f8fafc;
-        font-family: 'Poppins', sans-serif;
-        color: #1e293b;
+        background-color: #F8FAFC;
+        font-family: 'Inter', sans-serif;
+        color: #1F2937;
+        -webkit-tap-highlight-color: transparent;
+        overflow-x: hidden;
       }
-      /* Hide scrollbar for horizontal scrolling areas */
+      .dark body {
+        background-color: #0F172A;
+        color: #F8FAFC;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif;
+      }
+      
+      /* Hide scrollbar */
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
@@ -53,9 +108,39 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
-      .pb-safe {
-        padding-bottom: env(safe-area-inset-bottom, 20px);
+      
+      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 80px); }
+      .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
+      
+      /* Modern Gradient Background */
+      .bg-gradient-mesh {
+        background: radial-gradient(circle at 0% 0%, rgba(13, 148, 136, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, rgba(13, 148, 136, 0.05) 0%, transparent 50%),
+                    radial-gradient(circle at 0% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+        background-attachment: fixed;
       }
+      .dark .bg-gradient-mesh {
+        background: radial-gradient(circle at 0% 0%, rgba(13, 148, 136, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 100% 0%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+      }
+
+      /* Glassmorphism */
+      .glass {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .dark .glass {
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Staggered Animation Delays */
+      .delay-100 { animation-delay: 100ms; }
+      .delay-200 { animation-delay: 200ms; }
+      .delay-300 { animation-delay: 300ms; }
     </style>
   <script type="importmap">
 {
@@ -69,7 +154,7 @@
 }
 </script>
 </head>
-  <body>
+  <body class="bg-gradient-mesh dark:bg-navy text-charcoal dark:text-gray-100 transition-colors duration-500 min-h-screen">
     <div id="root"></div>
   </body>
 </html>
